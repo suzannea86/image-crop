@@ -1,0 +1,45 @@
+<h1>Edit user and Crop Image</h1>
+
+<% content_for(:head) do %>
+<%= stylesheet_link_tag "jquery.Jcrop" %>
+<%= javascript_include_tag "jquery.Jcrop" %>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+  $('#cropbox').Jcrop({
+    onChange: update_crop,
+    onSelect: update_crop,
+    setSelect: [0, 0, 100, 100],
+    aspectRatio: 1
+  });
+});
+
+function update_crop(coords) {
+  url = '<%= @user.filepicker_url += "/convert?crop=" %>';
+  cropped_url = url + coords.x + "," + coords.y + "," + coords.h + "," + coords.w;
+  $("#cropped_url").html(cropped_url);
+  $("#cropped_img").attr("src", cropped_url);
+  $("#crop_x").val(coords.x);
+  $("#crop_y").val(coords.y);
+  $("#crop_w").val(coords.w);
+  $("#crop_h").val(coords.h);
+}
+</script>
+<% end %>
+
+<%= image_tag @user.filepicker_url, :id => "cropbox" %>
+
+<%= form_for @user do |f| %>
+  <% for attribute in [:crop_x, :crop_y, :crop_w, :crop_h] %>
+    <%= f.text_field attribute, :id => attribute %>
+  <% end %>
+
+  <p> <%= f.submit "Crop" %> </p>
+<% end %>
+
+<p> The New image and the corresponding Url </p>
+<div id="cropped_url"></div>
+<img id="cropped_img" src=""/>
+
+
+<%= link_to 'Show', @user %> |
+<%= link_to 'Back', users_path %>
